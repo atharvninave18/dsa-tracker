@@ -1,0 +1,17 @@
+{
+  "name": "DSA Tracker",
+  "short_name": "DSA Tracker",
+  "description": "Track your Data Structures & Algorithms practice progress",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f5f7fa",
+  "theme_color": "#1565c0",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
