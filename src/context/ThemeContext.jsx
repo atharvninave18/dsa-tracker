@@ -1,15 +1,20 @@
-import { createContext, useContext, useCallback, useMemo, useState } from 'react';
+import { createContext, useContext, useCallback, useMemo, useState, useEffect } from 'react';
+import { STORAGE_KEYS } from '../constants';
 
 const ThemeContext = createContext(null);
 
 export function ThemeProvider({ children }) {
   const [mode, setModeState] = useState(() => {
-    return localStorage.getItem('dsa-tracker-theme') || 'light';
+    return localStorage.getItem(STORAGE_KEYS.THEME) || 'dark';
   });
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', mode);
+  }, [mode]);
 
   const setMode = useCallback((newMode) => {
     setModeState(newMode);
-    localStorage.setItem('dsa-tracker-theme', newMode);
+    localStorage.setItem(STORAGE_KEYS.THEME, newMode);
   }, []);
 
   const toggleMode = useCallback(() => {

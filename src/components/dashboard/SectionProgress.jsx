@@ -6,7 +6,7 @@ export default function SectionProgress({ sections }) {
     return (
       <Panel title="Section progress" subtitle="By topic & pattern">
         <Typography variant="body2" color="text.secondary">
-          Import questions to see section breakdown.
+          Complete questions to see which topics need work.
         </Typography>
       </Panel>
     );
@@ -19,7 +19,7 @@ export default function SectionProgress({ sections }) {
           <Box key={section.key}>
             <Box display="flex" alignItems="center" gap={1} mb={0.75}>
               <Chip
-                label={section.groupType === 'pattern' ? 'Pattern' : 'Topic'}
+                label="Topic"
                 size="small"
                 variant="outlined"
                 sx={{ height: 20, fontSize: '0.625rem', fontWeight: 600 }}

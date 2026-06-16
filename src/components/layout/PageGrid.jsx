@@ -35,17 +35,20 @@ export function PageSplit({ left, right, sx }) {
 }
 
 /** Optional section label above a group of rows */
-export function PageSectionTitle({ title, subtitle }) {
+export function PageSectionTitle({ title, subtitle, action }) {
   return (
-    <Box sx={{ mb: 2 }}>
-      <Typography variant="subtitle1" fontWeight={600} letterSpacing="-0.01em">
-        {title}
-      </Typography>
-      {subtitle && (
-        <Typography variant="body2" color="text.secondary" mt={0.25}>
-          {subtitle}
+    <Box sx={{ mb: 2.5, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 2 }}>
+      <Box>
+        <Typography variant="h6" fontWeight={600} letterSpacing="-0.02em">
+          {title}
         </Typography>
-      )}
+        {subtitle && (
+          <Typography variant="body2" color="text.secondary" mt={0.25}>
+            {subtitle}
+          </Typography>
+        )}
+      </Box>
+      {action}
     </Box>
   );
 }

@@ -19,12 +19,17 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import BackupIcon from '@mui/icons-material/Backup';
 import RestoreIcon from '@mui/icons-material/Restore';
 import { useDsa } from '../../context/DsaContext';
+import { useTracker } from '../../context/TrackerContext';
 import { useToast } from '../../context/ToastContext';
 import { exportToCSV, exportToJSON, importFromCSV, importFromJSON, downloadFile } from '../../utils/exportImport';
+import { useConfirmDialog } from '../../hooks/useConfirmDialog';
+import ConfirmDialog from './ConfirmDialog';
 
 export default function ImportExportModal({ open, onClose }) {
   const { questions, settings, goals, importData, restoreFromBackup } = useDsa();
+  const { exportArchive, importArchive, resetArchive } = useTracker();
   const { showToast } = useToast();
+  const { confirm, dialogProps } = useConfirmDialog();
   const [tab, setTab] = useState(0);
   const [importText, setImportText] = useState('');
   const [replaceExisting, setReplaceExisting] = useState(true);
@@ -86,13 +91,66 @@ export default function ImportExportModal({ open, onClose }) {
     }
   };
 
+  const handleExportArchive = async () => {
+    try {
+      const data = await exportArchive();
+      downloadFile(JSON.stringify(data, null, 2), `dsa-question-bank-${Date.now()}.json`, 'application/json');
+      showToast('Question bank exported');
+    } catch (err) {
+      showToast(err.message, 'error');
+    }
+  };
+
+  const handleImportArchive = async () => {
+    try {
+      const data = JSON.parse(importText);
+      const imported = await importArchive(data);
+      const count = imported.reduce((n, t) => n + t.questions.length, 0);
+      showToast(`Imported ${count} questions across ${imported.length} topics`);
+      setImportText('');
+      onClose();
+    } catch (err) {
+      showToast(err.message || 'Invalid archive JSON', 'error');
+    }
+  };
+
+  const handleResetArchive = async () => {
+    const ok = await confirm({
+      title: 'Reset question bank?',
+      message: 'All progress, notes, and review flags will be cleared. This cannot be undone.',
+    });
+    if (!ok) return;
+    try {
+      await resetArchive();
+      showToast('Question bank reset');
+      onClose();
+    } catch (err) {
+      showToast(err.message, 'error');
+    }
+  };
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>Import / Export</DialogTitle>
       <DialogContent dividers>
         <Stack spacing={3}>
           <Box>
-            <Typography variant="subtitle2" gutterBottom>Export</Typography>
+            <Typography variant="subtitle2" gutterBottom>Question bank (IndexedDB)</Typography>
+            <Typography variant="caption" color="text.secondary" display="block" mb={1}>
+              Your progress on the Questions tab — status, notes, and review flags.
+            </Typography>
+            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+              <Button startIcon={<FileDownloadIcon />} variant="outlined" onClick={handleExportArchive}>
+                Export bank
+              </Button>
+              <Button startIcon={<RestoreIcon />} variant="outlined" color="warning" onClick={handleResetArchive}>
+                Reset bank
+              </Button>
+            </Stack>
+          </Box>
+
+          <Box>
+            <Typography variant="subtitle2" gutterBottom>Overview data</Typography>
             <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
               <Button startIcon={<FileDownloadIcon />} variant="outlined" onClick={handleExportJSON}>
                 JSON backup
@@ -108,6 +166,7 @@ export default function ImportExportModal({ open, onClose }) {
             <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ mb: 1 }}>
               <Tab label="JSON" />
               <Tab label="CSV" />
+              <Tab label="Bank JSON" />
             </Tabs>
             {tab === 1 && (
               <FormControlLabel
@@ -135,7 +194,9 @@ export default function ImportExportModal({ open, onClose }) {
               fullWidth
               multiline
               minRows={6}
-              placeholder={tab === 0 ? 'Paste JSON backup...' : 'Paste CSV data...'}
+              placeholder={
+                tab === 0 ? 'Paste JSON backup...' : tab === 1 ? 'Paste CSV data...' : 'Paste question bank JSON...'
+              }
               value={importText}
               onChange={(e) => setImportText(e.target.value)}
             />
@@ -151,12 +212,19 @@ export default function ImportExportModal({ open, onClose }) {
                 Restore backup
               </Button>
             )}
-            <Button startIcon={<BackupIcon />} onClick={handleImport} variant="contained">
-              Import
-            </Button>
+            {tab === 2 ? (
+              <Button startIcon={<BackupIcon />} onClick={handleImportArchive} variant="contained">
+                Import bank
+              </Button>
+            ) : (
+              <Button startIcon={<BackupIcon />} onClick={handleImport} variant="contained">
+                Import
+              </Button>
+            )}
           </>
         )}
       </DialogActions>
+      <ConfirmDialog {...dialogProps} />
     </Dialog>
   );
 }

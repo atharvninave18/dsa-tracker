@@ -48,7 +48,7 @@ export function saveGoals(goals) {
 }
 
 export function loadTheme() {
-  return localStorage.getItem(STORAGE_KEYS.THEME) || 'light';
+  return localStorage.getItem(STORAGE_KEYS.THEME) || 'dark';
 }
 
 export function saveTheme(mode) {

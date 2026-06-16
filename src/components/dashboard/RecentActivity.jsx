@@ -1,26 +1,25 @@
 import { Box, Typography, Link } from '@mui/material';
 import Panel from '../common/Panel';
-import DifficultyBadge from '../common/DifficultyBadge';
-import { formatDate } from '../../utils/helpers';
+import { formatDateTime } from '../../utils/helpers';
 
-export default function RecentActivity({ recentlySolved, inProgressQuestions }) {
-  const hasActivity = recentlySolved.length > 0 || inProgressQuestions.length > 0;
+export default function RecentActivity({ recentlySolved, revisionQueue }) {
+  const hasActivity = recentlySolved.length > 0 || revisionQueue.length > 0;
 
   return (
     <Panel title="Recent activity" subtitle="Latest updates">
       {!hasActivity ? (
         <Typography variant="body2" color="text.secondary">
-          Mark questions as Done or In Progress to see activity here.
+          Mark questions as done to see activity here.
         </Typography>
       ) : (
         <Box display="flex" flexDirection="column" gap={2}>
-          {inProgressQuestions.length > 0 && (
+          {revisionQueue.length > 0 && (
             <Box>
               <Typography variant="caption" color="text.secondary" fontWeight={600} sx={{ letterSpacing: '0.06em', textTransform: 'uppercase', mb: 1, display: 'block' }}>
-                In progress
+                Due for review
               </Typography>
-              {inProgressQuestions.map((q) => (
-                <ActivityRow key={q.id} question={q} meta="Working on" />
+              {revisionQueue.slice(0, 3).map((q) => (
+                <ActivityRow key={q.id} question={q} meta={q.topic} />
               ))}
             </Box>
           )}
@@ -31,7 +30,7 @@ export default function RecentActivity({ recentlySolved, inProgressQuestions }) 
                 Recently solved
               </Typography>
               {recentlySolved.map((q) => (
-                <ActivityRow key={q.id} question={q} meta={formatDate(q.solvedAt)} />
+                <ActivityRow key={q.id} question={q} meta={formatDateTime(q.solvedAt)} />
               ))}
             </Box>
           )}
@@ -64,7 +63,6 @@ function ActivityRow({ question, meta }) {
         )}
         <Typography variant="caption" color="text.secondary">{meta}</Typography>
       </Box>
-      <DifficultyBadge difficulty={question.difficulty} />
     </Box>
   );
 }

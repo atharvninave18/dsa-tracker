@@ -1,12 +1,30 @@
-import { Box, Typography, IconButton, Tooltip, ToggleButtonGroup, ToggleButton } from '@mui/material';
+import { Link, useLocation } from 'react-router-dom';
+import {
+  Box,
+  Typography,
+  IconButton,
+  Tooltip,
+  Button,
+} from '@mui/material';
 import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
 import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
 import TimerOutlinedIcon from '@mui/icons-material/TimerOutlined';
 import UploadFileOutlinedIcon from '@mui/icons-material/UploadFileOutlined';
 import { useThemeMode } from '../../context/ThemeContext';
 
-export default function Header({ tab, onTabChange, onImportExport, onPomodoro }) {
+const NAV = [
+  { to: '/', label: 'Overview', exact: true },
+  { to: '/questions', label: 'Questions', exact: false },
+];
+
+function isNavActive(pathname, to, exact) {
+  if (exact) return pathname === to;
+  return pathname === to || pathname.startsWith(`${to}/`);
+}
+
+export default function Header({ onImportExport, onPomodoro }) {
   const { isDark, toggleMode } = useThemeMode();
+  const { pathname } = useLocation();
 
   return (
     <Box
@@ -18,57 +36,88 @@ export default function Header({ tab, onTabChange, onImportExport, onPomodoro })
         bgcolor: 'background.paper',
         borderBottom: 1,
         borderColor: 'divider',
+        flexShrink: 0,
       }}
     >
       <Box
         sx={{
-          maxWidth: 1200,
-          mx: 'auto',
+          width: '100%',
           px: { xs: 2, sm: 3 },
-          py: 1.5,
           display: 'flex',
           alignItems: 'center',
           gap: 2,
+          height: 57,
         }}
       >
-        <Typography variant="subtitle1" fontWeight={600} sx={{ mr: 1, flexShrink: 0 }}>
-          DSA Tracker
+        <Typography
+          component={Link}
+          to="/"
+          variant="subtitle1"
+          fontWeight={700}
+          sx={{
+            mr: 1,
+            flexShrink: 0,
+            letterSpacing: '-0.3px',
+            textDecoration: 'none',
+            color: 'text.primary',
+          }}
+        >
+          DSA{' '}
+          <Box component="span" sx={{ color: 'primary.light' }}>
+            Tracker
+          </Box>
         </Typography>
 
-        <ToggleButtonGroup
-          exclusive
-          value={tab}
-          onChange={(_, v) => v && onTabChange(v)}
-          size="small"
+        <Box
           sx={{
+            display: 'flex',
             bgcolor: 'background.default',
             p: 0.5,
             borderRadius: 2,
-            '& .MuiToggleButton-root': {
-              border: 0,
-              px: 2,
-              py: 0.75,
-              fontSize: '0.8125rem',
-              fontWeight: 500,
-              color: 'text.secondary',
-              '&.Mui-selected': {
-                bgcolor: 'background.paper',
-                color: 'text.primary',
-                boxShadow: '0 1px 2px rgba(0,0,0,0.06)',
-              },
-            },
+            border: 1,
+            borderColor: 'divider',
+            gap: 0.25,
           }}
         >
-          <ToggleButton value="dashboard">Overview</ToggleButton>
-          <ToggleButton value="questions">Questions</ToggleButton>
-        </ToggleButtonGroup>
+          {NAV.map(({ to, label, exact }) => {
+            const active = isNavActive(pathname, to, exact);
+            return (
+              <Button
+                key={to}
+                component={Link}
+                to={to}
+                size="small"
+                sx={{
+                  px: 2,
+                  py: 0.75,
+                  minWidth: 0,
+                  fontSize: '0.8125rem',
+                  fontWeight: 500,
+                  borderRadius: 1.5,
+                  color: active ? 'primary.light' : 'text.secondary',
+                  bgcolor: active ? 'action.selected' : 'transparent',
+                  textDecoration: 'none',
+                  '&:hover': {
+                    bgcolor: active ? 'action.selected' : 'action.hover',
+                  },
+                }}
+              >
+                {label}
+              </Button>
+            );
+          })}
+        </Box>
 
         <Box sx={{ ml: 'auto', display: 'flex', gap: 0.25 }}>
           <Tooltip title="Pomodoro">
-            <IconButton size="small" onClick={onPomodoro}><TimerOutlinedIcon fontSize="small" /></IconButton>
+            <IconButton size="small" onClick={onPomodoro}>
+              <TimerOutlinedIcon fontSize="small" />
+            </IconButton>
           </Tooltip>
           <Tooltip title="Import / Export">
-            <IconButton size="small" onClick={onImportExport}><UploadFileOutlinedIcon fontSize="small" /></IconButton>
+            <IconButton size="small" onClick={onImportExport}>
+              <UploadFileOutlinedIcon fontSize="small" />
+            </IconButton>
           </Tooltip>
           <Tooltip title="Toggle theme">
             <IconButton size="small" onClick={toggleMode}>

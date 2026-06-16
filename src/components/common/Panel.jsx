@@ -7,7 +7,7 @@ export default function Panel({ title, subtitle, action, children, sx, noPadding
       sx={{
         border: 1,
         borderColor: 'divider',
-        borderRadius: 2,
+        borderRadius: 1,
         bgcolor: 'background.paper',
         overflow: 'hidden',
         display: 'flex',

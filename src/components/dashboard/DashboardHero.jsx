@@ -1,6 +1,7 @@
+import { Link } from 'react-router-dom';
 import { Box, Typography, Button, Stack } from '@mui/material';
 import ShuffleIcon from '@mui/icons-material/Shuffle';
-import PlayArrowOutlinedIcon from '@mui/icons-material/PlayArrowOutlined';
+import MenuBookOutlinedIcon from '@mui/icons-material/MenuBookOutlined';
 import Panel from '../common/Panel';
 
 function RingProgress({ value, size = 80 }) {
@@ -26,9 +27,8 @@ export default function DashboardHero({
   stats,
   streak,
   periodStats,
-  inProgressQuestions,
+  revisionCount,
   onRandomPick,
-  onContinue,
 }) {
   const greeting = (() => {
     const h = new Date().getHours();
@@ -47,29 +47,25 @@ export default function DashboardHero({
           alignItems: 'center',
         }}
       >
-        {/* Left half */}
         <Box display="flex" alignItems="center" gap={2.5}>
-          <Box color="text.primary"><RingProgress value={stats.completionPct} /></Box>
+          <Box color="primary.main"><RingProgress value={stats.completionPct} /></Box>
           <Box minWidth={0}>
             <Typography variant="h5" fontWeight={700} sx={{ letterSpacing: '-0.02em' }}>{greeting}</Typography>
             <Typography variant="body2" color="text.secondary" mt={0.5}>
-              {stats.done} of {stats.total} solved
+              {stats.done + stats.revise} of {stats.total} completed
               {streak.current > 0 && ` · ${streak.current}d streak`}
             </Typography>
             <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap mt={1.5}>
-              <Button variant="contained" size="small" startIcon={<ShuffleIcon />} onClick={onRandomPick}>
+              <Button component={Link} to="/questions" variant="contained" size="small" startIcon={<MenuBookOutlinedIcon />}>
+                Question bank
+              </Button>
+              <Button variant="outlined" size="small" startIcon={<ShuffleIcon />} onClick={onRandomPick}>
                 Random
               </Button>
-              {inProgressQuestions.length > 0 && (
-                <Button variant="outlined" size="small" startIcon={<PlayArrowOutlinedIcon />} onClick={() => onContinue(inProgressQuestions[0])}>
-                  Continue
-                </Button>
-              )}
             </Stack>
           </Box>
         </Box>
 
-        {/* Right half */}
         <Box
           sx={{
             display: 'grid',
@@ -82,8 +78,8 @@ export default function DashboardHero({
         >
           {[
             { label: 'Pending', value: stats.pending },
-            { label: 'In progress', value: stats.inProgress },
-            { label: 'Revision', value: stats.revision },
+            { label: 'To revise', value: stats.revise },
+            { label: 'Due review', value: revisionCount },
           ].map(({ label, value }) => (
             <Box key={label} textAlign="center">
               <Typography variant="h5" fontWeight={700}>{value}</Typography>

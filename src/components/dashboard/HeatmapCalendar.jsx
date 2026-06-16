@@ -2,19 +2,33 @@ import { useMemo } from 'react';
 import { Typography, Box, Tooltip } from '@mui/material';
 import { format, parseISO } from 'date-fns';
 import { useThemeMode } from '../../context/ThemeContext';
+import { getTrackerColors } from '../../theme/colors';
 import { buildHeatmapGrid } from '../../utils/helpers';
 import Panel from '../common/Panel';
 
-// GitHub contribution graph colors
-const LEVELS_LIGHT = ['#ebedf0', '#9be9a8', '#40c463', '#30a14e', '#216e39'];
-const LEVELS_DARK = ['#161b22', '#0e4429', '#006d32', '#26a641', '#39d353'];
+function getHeatmapLevels(isDark) {
+  const c = getTrackerColors(isDark ? 'dark' : 'light');
+  return [
+    isDark ? c.bg3 : c.bg4,
+    alphaGreen(c.green, 0.25),
+    alphaGreen(c.green, 0.45),
+    alphaGreen(c.green, 0.65),
+    c.green,
+  ];
+}
 
-const CELL = 11;
+function alphaGreen(hex, opacity) {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgba(${r},${g},${b},${opacity})`;
+}
+
 const GAP = 3;
 const DAY_LABELS = ['', 'Mon', '', 'Wed', '', 'Fri', ''];
 
 function getLevel(count, isDark) {
-  const palette = isDark ? LEVELS_DARK : LEVELS_LIGHT;
+  const palette = getHeatmapLevels(isDark);
   if (count === 0) return palette[0];
   if (count === 1) return palette[1];
   if (count === 2) return palette[2];
@@ -36,23 +50,33 @@ export default function HeatmapCalendar({ questions }) {
     [questions]
   );
 
-  const palette = isDark ? LEVELS_DARK : LEVELS_LIGHT;
+  const palette = getHeatmapLevels(isDark);
+  const c = getTrackerColors(isDark ? 'dark' : 'light');
 
   return (
     <Panel
-      title="Contributions"
+      title="Activity heatmap"
       subtitle={`${total} problem${total !== 1 ? 's' : ''} solved in the last year`}
       noPadding
     >
-      <Box sx={{ p: 2.5, overflowX: 'auto' }}>
-        <Box sx={{ display: 'inline-flex', flexDirection: 'column', minWidth: 'max-content' }}>
+      <Box sx={{ p: { xs: 2, sm: 2.5 }, width: '100%' }}>
+        <Box sx={{ width: '100%', minWidth: 0 }}>
           {/* Month labels row */}
-          <Box sx={{ display: 'flex', ml: '28px', mb: 0.75, height: 14 }}>
+          <Box
+            sx={{
+              display: 'flex',
+              ml: { xs: '24px', sm: '28px' },
+              mb: 0.75,
+              height: 14,
+              width: 'calc(100% - 28px)',
+            }}
+          >
             {monthLabels.map((label, i) => (
               <Box
                 key={i}
                 sx={{
-                  width: CELL + GAP,
+                  flex: 1,
+                  minWidth: 0,
                   fontSize: '10px',
                   color: 'text.secondary',
                   lineHeight: 1,
@@ -65,14 +89,15 @@ export default function HeatmapCalendar({ questions }) {
             ))}
           </Box>
 
-          <Box sx={{ display: 'flex' }}>
-            {/* Day-of-week labels (Mon, Wed, Fri) */}
+          <Box sx={{ display: 'flex', width: '100%' }}>
+            {/* Day-of-week labels */}
             <Box
               sx={{
                 display: 'flex',
                 flexDirection: 'column',
                 gap: `${GAP}px`,
                 mr: 1,
+                flexShrink: 0,
                 pt: `${GAP / 2}px`,
               }}
             >
@@ -80,12 +105,15 @@ export default function HeatmapCalendar({ questions }) {
                 <Box
                   key={i}
                   sx={{
-                    height: CELL,
+                    flex: 1,
+                    minHeight: 10,
+                    maxHeight: 16,
                     fontSize: '9px',
                     color: 'text.secondary',
-                    lineHeight: `${CELL}px`,
-                    textAlign: 'right',
-                    width: 22,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'flex-end',
+                    width: { xs: 18, sm: 22 },
                   }}
                 >
                   {label}
@@ -93,10 +121,19 @@ export default function HeatmapCalendar({ questions }) {
               ))}
             </Box>
 
-            {/* Grid: columns = weeks, rows = Sun–Sat */}
-            <Box sx={{ display: 'flex', gap: `${GAP}px` }}>
+            {/* Grid: columns = weeks, rows = Sun–Sat — stretches to full width */}
+            <Box sx={{ display: 'flex', gap: `${GAP}px`, flex: 1, minWidth: 0 }}>
               {weeks.map((week, wi) => (
-                <Box key={wi} sx={{ display: 'flex', flexDirection: 'column', gap: `${GAP}px` }}>
+                <Box
+                  key={wi}
+                  sx={{
+                    flex: 1,
+                    minWidth: 0,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: `${GAP}px`,
+                  }}
+                >
                   {week.map((day, di) => (
                     <Tooltip
                       key={di}
@@ -110,15 +147,16 @@ export default function HeatmapCalendar({ questions }) {
                     >
                       <Box
                         sx={{
-                          width: CELL,
-                          height: CELL,
+                          width: '100%',
+                          aspectRatio: '1',
+                          maxHeight: 16,
                           borderRadius: '2px',
                           bgcolor: day ? getLevel(day.count, isDark) : 'transparent',
-                          outline: day && day.count === 0 && isDark ? '1px solid #21262d' : 'none',
+                          outline: day && day.count === 0 && isDark ? `1px solid ${c.bg4}` : 'none',
                           cursor: day ? 'pointer' : 'default',
-                          transition: 'outline 0.1s',
+                          transition: 'outline 0.1s, transform 0.1s',
                           '&:hover': day
-                            ? { outline: `1px solid ${isDark ? '#8b949e' : '#1b1f2426'}` }
+                            ? { outline: `1px solid ${c.textMuted}`, transform: 'scale(1.15)' }
                             : {},
                         }}
                       />
@@ -145,7 +183,7 @@ export default function HeatmapCalendar({ questions }) {
             {palette.map((color) => (
               <Box
                 key={color}
-                sx={{ width: CELL, height: CELL, borderRadius: '2px', bgcolor: color }}
+                sx={{ width: 12, height: 12, borderRadius: '2px', bgcolor: color }}
               />
             ))}
             <Typography variant="caption" color="text.secondary" sx={{ fontSize: 10, ml: 0.25 }}>

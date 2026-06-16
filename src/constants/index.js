@@ -12,18 +12,18 @@ export const TAGS = [
   'Recursion', 'BFS', 'DFS', 'String', 'Union Find', 'Topological Sort', 'Dijkstra',
 ];
 
-/** Muted, professional badge colors */
+/** Status badge colors aligned with tracker palette */
 export const STATUS_COLORS = {
-  Pending: { dot: '#a1a1aa', bg: '#f4f4f5', color: '#52525b', darkBg: '#27272a', darkColor: '#d4d4d8' },
-  'In Progress': { dot: '#2563eb', bg: '#eff6ff', color: '#1d4ed8', darkBg: '#1e3a5f', darkColor: '#93c5fd' },
-  Done: { dot: '#16a34a', bg: '#f0fdf4', color: '#15803d', darkBg: '#14532d', darkColor: '#86efac' },
-  'Revision Required': { dot: '#dc2626', bg: '#fef2f2', color: '#b91c1c', darkBg: '#450a0a', darkColor: '#fca5a5' },
+  Pending: { dot: '#6b7280', bg: 'rgba(107,114,128,0.12)', color: '#9ba3b8', darkBg: '#1e2535', darkColor: '#9ba3b8' },
+  'In Progress': { dot: '#3b82f6', bg: 'rgba(59,130,246,0.12)', color: '#3b82f6', darkBg: '#1e2535', darkColor: '#60a5fa' },
+  Done: { dot: '#22c55e', bg: 'rgba(34,197,94,0.12)', color: '#22c55e', darkBg: '#1e2535', darkColor: '#4ade80' },
+  'Revision Required': { dot: '#f59e0b', bg: 'rgba(245,158,11,0.12)', color: '#f59e0b', darkBg: '#1e2535', darkColor: '#fbbf24' },
 };
 
 export const DIFFICULTY_COLORS = {
-  Easy: { dot: '#16a34a', bg: '#f0fdf4', color: '#15803d', darkBg: '#14532d', darkColor: '#86efac' },
-  Medium: { dot: '#d97706', bg: '#fffbeb', color: '#b45309', darkBg: '#451a03', darkColor: '#fcd34d' },
-  Hard: { dot: '#dc2626', bg: '#fef2f2', color: '#b91c1c', darkBg: '#450a0a', darkColor: '#fca5a5' },
+  Easy: { dot: '#22c55e', bg: 'rgba(34,197,94,0.12)', color: '#22c55e', darkBg: '#1e2535', darkColor: '#4ade80' },
+  Medium: { dot: '#f59e0b', bg: 'rgba(245,158,11,0.12)', color: '#f59e0b', darkBg: '#1e2535', darkColor: '#fbbf24' },
+  Hard: { dot: '#ef4444', bg: 'rgba(239,68,68,0.1)', color: '#ef4444', darkBg: '#1e2535', darkColor: '#f87171' },
 };
 
 export const STORAGE_KEYS = {

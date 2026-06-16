@@ -42,26 +42,20 @@ function StatItem({ title, value, hint, icon: Icon, color, hintColor }) {
 
 export default function StatCards({ stats, streak, periodStats }) {
   const leftStats = [
-    { title: 'Total', value: stats.total, hint: 'In your list', icon: LibraryBooksIcon, color: '#71717a' },
-    { title: 'Solved', value: stats.done, hint: `${stats.completionPct}% complete`, icon: CheckCircleIcon, color: '#16a34a', hintColor: 'success.main' },
-    { title: 'Pending', value: stats.pending, hint: 'Not started', icon: HourglassEmptyIcon, color: '#2563eb' },
+    { title: 'Total', value: stats.total, hint: 'On the sheet', icon: LibraryBooksIcon, color: 'text.secondary' },
+    { title: 'Done', value: stats.done, hint: `${stats.completionPct}% complete`, icon: CheckCircleIcon, color: 'success.main', hintColor: 'success.main' },
+    { title: 'Pending', value: stats.pending, hint: 'Not started', icon: HourglassEmptyIcon, color: 'info.main' },
   ];
 
   const rightStats = [
-    { title: 'Revision', value: stats.revision, hint: stats.overdue > 0 ? `${stats.overdue} overdue` : 'Up to date', icon: AutorenewIcon, color: '#dc2626', hintColor: stats.overdue > 0 ? 'error.main' : 'text.secondary' },
-    { title: 'Streak', value: `${streak.current}d`, hint: `Best ${streak.longest}d`, icon: WhatshotIcon, color: '#ea580c' },
-    { title: 'This week', value: periodStats.weekly, hint: `${periodStats.monthly} this month`, icon: CalendarMonthIcon, color: '#8b5cf6' },
+    { title: 'To revise', value: stats.revise, hint: stats.overdue > 0 ? `${stats.overdue} overdue` : 'On schedule', icon: AutorenewIcon, color: 'warning.main', hintColor: stats.overdue > 0 ? 'warning.main' : 'text.secondary' },
+    { title: 'Streak', value: `${streak.current}d`, hint: `Best ${streak.longest}d`, icon: WhatshotIcon, color: 'warning.main' },
+    { title: 'This week', value: periodStats.weekly, hint: `${periodStats.monthly} this month`, icon: CalendarMonthIcon, color: 'primary.light' },
   ];
 
   return (
-    <Box
-      sx={{
-        display: 'grid',
-        gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
-        gap: 2.5,
-      }}
-    >
-      <Panel title="Progress" subtitle="Overall stats">
+    <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 2.5 }}>
+      <Panel title="Progress" subtitle="Sheet stats">
         {leftStats.map((s) => <StatItem key={s.title} {...s} />)}
       </Panel>
       <Panel title="Activity" subtitle="Streak & schedule">

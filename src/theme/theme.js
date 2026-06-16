@@ -1,33 +1,26 @@
 import { createTheme, alpha } from '@mui/material/styles';
+import { getTrackerColors } from './colors';
 
 export function createAppTheme(mode) {
+  const c = getTrackerColors(mode);
   const isDark = mode === 'dark';
 
-  const palette = isDark
-    ? {
-        mode: 'dark',
-        primary: { main: '#fafafa', dark: '#e4e4e7', light: '#ffffff' },
-        secondary: { main: '#a1a1aa' },
-        success: { main: '#4ade80' },
-        warning: { main: '#fbbf24' },
-        error: { main: '#f87171' },
-        info: { main: '#60a5fa' },
-        background: { default: '#09090b', paper: '#18181b' },
-        text: { primary: '#fafafa', secondary: '#a1a1aa' },
-        divider: '#27272a',
-      }
-    : {
-        mode: 'light',
-        primary: { main: '#18181b', dark: '#09090b', light: '#3f3f46' },
-        secondary: { main: '#71717a' },
-        success: { main: '#16a34a' },
-        warning: { main: '#d97706' },
-        error: { main: '#dc2626' },
-        info: { main: '#2563eb' },
-        background: { default: '#fafafa', paper: '#ffffff' },
-        text: { primary: '#18181b', secondary: '#71717a' },
-        divider: '#e4e4e7',
-      };
+  const palette = {
+    mode: isDark ? 'dark' : 'light',
+    primary: { main: c.accent, light: c.accentLight, dark: '#5a52e0', contrastText: '#ffffff' },
+    secondary: { main: c.textSecondary },
+    success: { main: c.green },
+    warning: { main: c.amber },
+    error: { main: c.red },
+    info: { main: c.blue },
+    background: { default: c.bg, paper: c.bg2 },
+    text: { primary: c.text, secondary: c.textSecondary, disabled: c.textMuted },
+    divider: c.borderSolid,
+    action: {
+      hover: alpha(c.accent, isDark ? 0.08 : 0.06),
+      selected: alpha(c.accent, isDark ? 0.15 : 0.1),
+    },
+  };
 
   return createTheme({
     palette,
@@ -41,12 +34,16 @@ export function createAppTheme(mode) {
       body2: { fontSize: '0.875rem' },
       caption: { fontSize: '0.75rem', color: palette.text.secondary },
     },
-    shape: { borderRadius: 8 },
+    shape: { borderRadius: c.radius },
     shadows: Array(25).fill('none'),
     components: {
       MuiCssBaseline: {
         styleOverrides: {
-          body: { letterSpacing: '-0.01em' },
+          body: {
+            letterSpacing: '-0.01em',
+            backgroundColor: c.bg,
+            color: c.text,
+          },
         },
       },
       MuiButton: {
@@ -55,19 +52,22 @@ export function createAppTheme(mode) {
           root: {
             textTransform: 'none',
             fontWeight: 500,
-            borderRadius: 8,
+            borderRadius: c.radiusSm,
             boxShadow: 'none',
             '&:hover': { boxShadow: 'none' },
           },
           contained: {
-            bgcolor: isDark ? '#fafafa' : '#18181b',
-            color: isDark ? '#18181b' : '#fafafa',
-            '&:hover': { bgcolor: isDark ? '#e4e4e7' : '#27272a' },
+            bgcolor: c.accent,
+            color: '#fff',
+            '&:hover': { bgcolor: c.accentLight },
           },
           outlined: {
-            borderColor: palette.divider,
+            borderColor: c.borderSolid,
             color: palette.text.primary,
-            '&:hover': { borderColor: palette.text.secondary, bgcolor: alpha(palette.text.primary, 0.04) },
+            '&:hover': {
+              borderColor: c.accent,
+              bgcolor: alpha(c.accent, isDark ? 0.1 : 0.06),
+            },
           },
           text: { color: palette.text.secondary },
         },
@@ -75,28 +75,28 @@ export function createAppTheme(mode) {
       MuiIconButton: {
         styleOverrides: {
           root: {
-            borderRadius: 8,
+            borderRadius: c.radiusSm,
             color: palette.text.secondary,
-            '&:hover': { bgcolor: alpha(palette.text.primary, 0.06) },
+            '&:hover': { bgcolor: alpha(c.accent, isDark ? 0.1 : 0.06), color: c.accentLight },
           },
         },
       },
       MuiChip: {
         styleOverrides: {
-          root: { fontWeight: 500, borderRadius: 6 },
-          outlined: { borderColor: palette.divider },
+          root: { fontWeight: 500, borderRadius: c.radiusSm },
+          outlined: { borderColor: c.borderSolid },
         },
       },
       MuiTableCell: {
         styleOverrides: {
-          root: { borderColor: palette.divider, py: 1.5 },
+          root: { borderColor: c.borderSolid, py: 1.5 },
           head: {
             fontWeight: 500,
             fontSize: '0.75rem',
             color: palette.text.secondary,
             textTransform: 'uppercase',
             letterSpacing: '0.04em',
-            bgcolor: isDark ? '#18181b' : '#fafafa',
+            bgcolor: c.bg3,
           },
         },
       },
@@ -104,7 +104,8 @@ export function createAppTheme(mode) {
         styleOverrides: {
           root: {
             '&:last-child td': { borderBottom: 0 },
-            '&.Mui-selected': { bgcolor: alpha(isDark ? '#fff' : '#000', 0.04) },
+            '&:hover': { bgcolor: alpha(c.bg3, 0.6) },
+            '&.Mui-selected': { bgcolor: alpha(c.accent, 0.08) },
           },
         },
       },
@@ -113,42 +114,55 @@ export function createAppTheme(mode) {
         styleOverrides: {
           root: {
             '& .MuiOutlinedInput-root': {
-              borderRadius: 8,
-              bgcolor: isDark ? '#09090b' : '#fafafa',
-              '& fieldset': { borderColor: palette.divider },
+              borderRadius: c.radiusSm,
+              bgcolor: c.bg3,
+              '& fieldset': { borderColor: c.borderSolid },
+              '&:hover fieldset': { borderColor: c.border2 },
+              '&.Mui-focused fieldset': { borderColor: c.accent },
             },
           },
         },
       },
       MuiSelect: {
         styleOverrides: {
-          root: { borderRadius: 8 },
+          root: { borderRadius: c.radiusSm },
         },
       },
       MuiPaper: {
         styleOverrides: {
-          root: { backgroundImage: 'none', boxShadow: 'none', border: `1px solid ${palette.divider}` },
+          root: {
+            backgroundImage: 'none',
+            boxShadow: 'none',
+            border: `1px solid ${c.borderSolid}`,
+            bgcolor: c.bg2,
+          },
         },
       },
       MuiDialog: {
         styleOverrides: {
-          paper: { borderRadius: 12, border: `1px solid ${palette.divider}` },
+          paper: { borderRadius: c.radius, border: `1px solid ${c.borderSolid}`, bgcolor: c.bg2 },
         },
       },
       MuiLinearProgress: {
         styleOverrides: {
-          root: { borderRadius: 4, height: 4, bgcolor: alpha(palette.text.primary, 0.08) },
-          bar: { borderRadius: 4, bgcolor: isDark ? '#fafafa' : '#18181b' },
+          root: { borderRadius: 3, height: 5, bgcolor: c.bg4 },
+          bar: {
+            borderRadius: 3,
+            background: `linear-gradient(90deg, ${c.accent}, ${c.accentLight})`,
+          },
         },
       },
       MuiCheckbox: {
         styleOverrides: {
-          root: { color: palette.divider },
+          root: {
+            color: c.textMuted,
+            '&.Mui-checked': { color: c.accent },
+          },
         },
       },
       MuiTabs: {
         styleOverrides: {
-          indicator: { display: 'none' },
+          indicator: { backgroundColor: c.accent },
         },
       },
       MuiTab: {
@@ -158,9 +172,30 @@ export function createAppTheme(mode) {
             fontWeight: 500,
             minHeight: 36,
             fontSize: '0.875rem',
-            borderRadius: 8,
+            borderRadius: c.radiusSm,
             color: palette.text.secondary,
-            '&.Mui-selected': { color: palette.text.primary },
+            '&.Mui-selected': { color: c.accentLight },
+          },
+        },
+      },
+      MuiToggleButton: {
+        styleOverrides: {
+          root: {
+            '&.Mui-selected': {
+              bgcolor: alpha(c.accent, isDark ? 0.15 : 0.1),
+              color: c.accentLight,
+              '&:hover': { bgcolor: alpha(c.accent, isDark ? 0.2 : 0.14) },
+            },
+          },
+        },
+      },
+      MuiTooltip: {
+        styleOverrides: {
+          tooltip: {
+            bgcolor: c.bg3,
+            color: c.text,
+            border: `1px solid ${c.borderSolid}`,
+            fontSize: '0.75rem',
           },
         },
       },

@@ -1,6 +1,5 @@
 import { Box } from '@mui/material';
-import { useDsa } from '../../context/DsaContext';
-import { pickRandomQuestion } from '../../utils/helpers';
+import { useTracker } from '../../context/TrackerContext';
 import { useToast } from '../../context/ToastContext';
 import { PageFull, PageSplit, PageSectionTitle } from '../layout/PageGrid';
 import DashboardHero from './DashboardHero';
@@ -13,89 +12,81 @@ import SectionProgress from './SectionProgress';
 import RecentActivity from './RecentActivity';
 import PlatformBreakdown from './PlatformBreakdown';
 import DashboardInsights from './DashboardInsights';
-import RevisionQueue from '../common/RevisionQueue';
+import TrackerRevisionQueue from './TrackerRevisionQueue';
+import TodayFocus from './TodayFocus';
 
 export default function Dashboard() {
   const {
     stats,
     streak,
     periodStats,
-    topicStats,
     revisionQueue,
     questions,
-    filters,
     platformStats,
     groupedSectionsAll,
     recentlySolved,
-    inProgressQuestions,
     weakestSections,
     insights,
-  } = useDsa();
+    pickRandom,
+    loading,
+  } = useTracker();
   const { showToast } = useToast();
 
   const handleRandomPick = () => {
-    const q = pickRandomQuestion(questions, filters);
+    const q = pickRandom({ status: 'pending' });
     if (q) {
       showToast(`Try: ${q.name}`, 'info');
       if (q.link) window.open(q.link, '_blank');
     } else {
-      showToast('No unsolved questions available', 'warning');
+      showToast('No pending questions left — nice work!', 'success');
     }
   };
 
-  const handleContinue = (question) => {
-    if (question.link) window.open(question.link, '_blank');
-    else showToast(`Continue: ${question.name}`, 'info');
-  };
+  if (loading) return null;
 
   return (
     <Box>
       <PageSectionTitle title="Overview" subtitle="Your DSA practice at a glance" />
 
-      {/* 1 part — hero summary */}
       <PageFull>
         <DashboardHero
           stats={stats}
           streak={streak}
           periodStats={periodStats}
-          inProgressQuestions={inProgressQuestions}
+          revisionCount={revisionQueue.length}
           onRandomPick={handleRandomPick}
-          onContinue={handleContinue}
         />
       </PageFull>
 
-      {/* 2 parts — key metrics */}
-      <PageFull>
-        <StatCards stats={stats} streak={streak} periodStats={periodStats} />
-      </PageFull>
-
-      {/* 2 parts — charts */}
-      <PageSplit left={<ActivityChart />} right={<BreakdownChart />} />
-
-      {/* 1 part — heatmap needs full width */}
       <PageFull>
         <HeatmapCalendar questions={questions} />
       </PageFull>
 
-      {/* 2 parts — goals & insights */}
+      <PageFull>
+        <TodayFocus revisionQueue={revisionQueue} weakestSections={weakestSections} />
+      </PageFull>
+
+      <PageFull>
+        <StatCards stats={stats} streak={streak} periodStats={periodStats} />
+      </PageFull>
+
+      <PageSplit left={<ActivityChart />} right={<BreakdownChart />} />
+
       <PageSplit left={<GoalTracker />} right={<DashboardInsights insights={insights} />} />
 
-      {/* 2 parts — section progress & activity */}
       <PageSplit
         left={<SectionProgress sections={weakestSections} />}
-        right={<RecentActivity recentlySolved={recentlySolved} inProgressQuestions={inProgressQuestions} />}
+        right={<RecentActivity recentlySolved={recentlySolved} revisionQueue={revisionQueue} />}
       />
 
-      {/* 2 parts — platforms & revision */}
       <PageSplit
         left={<PlatformBreakdown platformStats={platformStats} total={stats.total} />}
-        right={<RevisionQueue revisionQueue={revisionQueue} />}
+        right={<TrackerRevisionQueue revisionQueue={revisionQueue} />}
       />
 
-      {/* 1 part — full breakdown table */}
-      <PageFull sx={{ mb: 0 }}>
-        <TopicAnalytics topicStats={topicStats} groupedSectionsAll={groupedSectionsAll} />
-      </PageFull>
+      {/* <PageFull sx={{ mb: 0 }}>
+        <TopicAnalytics groupedSectionsAll={groupedSectionsAll} />
+      </PageFull> */}
     </Box>
   );
 }

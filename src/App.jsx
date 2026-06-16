@@ -1,9 +1,13 @@
 import { ThemeProvider as MuiThemeProvider, CssBaseline } from '@mui/material';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, useThemeMode } from './context/ThemeContext';
 import { ToastProvider } from './context/ToastContext';
 import { DsaProvider } from './context/DsaContext';
+import { TrackerProvider } from './context/TrackerContext';
 import { createAppTheme } from './theme/theme';
-import AppLayout from './components/layout/AppLayout';
+import AppShell from './components/layout/AppShell';
+import DashboardPage from './pages/DashboardPage';
+import QuestionsPage from './pages/QuestionsPage';
 
 function ThemedApp() {
   const { mode } = useThemeMode();
@@ -14,7 +18,16 @@ function ThemedApp() {
       <CssBaseline />
       <ToastProvider>
         <DsaProvider>
-          <AppLayout />
+          <TrackerProvider>
+            <BrowserRouter>
+              <Routes>
+                <Route element={<AppShell />}>
+                  <Route index element={<DashboardPage />} />
+                  <Route path="questions" element={<QuestionsPage />} />
+                </Route>
+              </Routes>
+            </BrowserRouter>
+          </TrackerProvider>
         </DsaProvider>
       </ToastProvider>
     </MuiThemeProvider>
